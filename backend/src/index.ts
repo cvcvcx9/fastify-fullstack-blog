@@ -5,6 +5,7 @@ import {AppDataSource} from './typeorm'
 import mercurius from 'mercurius';
 import { DateTimeResolver } from 'graphql-scalars';
 import bcrypt from 'bcrypt';
+import fastifyJwt from "@fastify/jwt";
 
 dotenv.config();
 const app = fastify();
@@ -43,9 +44,11 @@ const resolvers = {
         },
         profile: async (_: any, __: any, context: any) => {
             try {
-                const decoded = await context.app.jwt.verify(context.reply.headers.authorization?.replace('Bearer ', ''));
+                if (!context.user) {
+                    throw new Error('Not authenticated');
+                }
                 const userRepo = AppDataSource.getRepository('User');
-                const user = await userRepo.findOneBy({id: decoded.id});
+                const user = await userRepo.findOneBy({id: context.user.id});
                 return user;
             }catch (error) {
                 console.error('Error fetching profile:', error);
@@ -54,7 +57,13 @@ const resolvers = {
         }
     },
     Mutation: {
-        createPost: async (_: any, {title, content}: any)=>{
+        createPost: async (_: any, {title, content}: any,context:any)=>{
+            if (!title || !content) {
+                throw new Error('Title and content are required');
+            }
+            if (!context.user) {
+                throw new Error('User not authenticated');
+            }
             const postRepo = AppDataSource.getRepository('Post');
             const post = postRepo.create({title, content});
             return postRepo.save(post);
@@ -91,11 +100,22 @@ AppDataSource.initialize().then(() => {
         schema,
         resolvers,
         graphiql: true,
-        context: (request, reply) => ({request, reply, app}),
+        context: async (request, reply) => {
+            let user = null;
+            const authHeader = request.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                const token = authHeader.replace('Bearer ', '');
+                try {
+                    const decoded = await reply.server.jwt.verify(token);
+                    user = decoded; // Store the user information in the context
+                } catch (error) {
+                    console.error('JWT verification failed:', error);
+                }
+            }
+            return { request, reply, app, user };
+        }
     });
-    app.register(require('fastify-jwt'),{
-        secret:process.env.JWT_SECRET,
-    })
+    app.register(fastifyJwt,{secret:process.env.JWT_SECRET!});
 
     app.listen({ port: 3000 }, (err, address) => {
         if (err) {
