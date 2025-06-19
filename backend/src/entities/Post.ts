@@ -11,6 +11,6 @@ export class Post {
   @Column()
   content!: string;
 
-  @Column({ default: () => 'NOW()' })
+  @Column({type:"timestamptz", default: () => 'NOW()' })
   createdAt!: Date;
 }

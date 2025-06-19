@@ -3,17 +3,19 @@ import fastify from 'fastify';
 import { Query } from 'typeorm/driver/Query';
 import {AppDataSource} from './typeorm'
 import mercurius from 'mercurius';
+import { DateTimeResolver } from 'graphql-scalars';
 
 
 dotenv.config();
 const app = fastify();
 
 const schema = `
+    scalar DateTime
     type Post {
         id: ID!
         title: String!
         content: String!
-        createdAt: String!
+        createdAt: DateTime!
     }
 
     type Query {
@@ -25,6 +27,7 @@ const schema = `
 `;
 
 const resolvers = {
+    DateTime: DateTimeResolver,
     Query:{
         posts: async () => {
             const postRepo = AppDataSource.getRepository('Post');

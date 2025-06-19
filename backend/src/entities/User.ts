@@ -12,7 +12,7 @@ export class User {
   @Column()
   password!: string;
 
-  @Column({ default: () => 'NOW()' })
+  @Column({type:'timestamptz', default: () => 'NOW()' })
   createdAt!: Date;
 
   @Column({ nullable: true })
