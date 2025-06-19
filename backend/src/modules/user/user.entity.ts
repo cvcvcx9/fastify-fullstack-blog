@@ -1,0 +1,24 @@
+import { Field, ID, ObjectType } from "type-graphql";
+import {  Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+
+@ObjectType()
+@Entity()
+export class User {
+    @Field(() => ID)
+    @PrimaryGeneratedColumn()
+    id!: number;
+
+    @Field()
+    @Column()
+    username!: string;
+
+    @Column()
+    password!: string;
+
+    @Field({ nullable: true })
+    @Column({ nullable: true })
+    email?: string;
+
+    @Column({ type: "timestamptz", default: () => "NOW()" })
+    createdAt!: Date;
+}
