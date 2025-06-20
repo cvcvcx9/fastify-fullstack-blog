@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import { AppDataSource } from './typeorm'
 import mercurius from 'mercurius';
 import fastifyJwt from "@fastify/jwt";
+import cors from '@fastify/cors';
 import { createSchema } from './graphql/schema';
 dotenv.config();
 const app = fastify();
@@ -10,6 +11,12 @@ const app = fastify();
 
 AppDataSource.initialize().then(async () => {
     app.register(fastifyJwt, { secret: process.env.JWT_SECRET! });
+    app.register(cors, {
+        origin: '*', // Allow all origins for development; adjust as needed for production
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+        allowedHeaders: ['Authorization', 'Content-Type'], // Allowed headers
+        credentials: true // Allow credentials (cookies, authorization headers, etc.)
+    })
     const schema = await createSchema();
     app.register(mercurius, {
         schema,
