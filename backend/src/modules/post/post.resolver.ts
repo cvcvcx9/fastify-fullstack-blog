@@ -5,11 +5,23 @@ import { AppDataSource } from "../../typeorm";
 
 @Resolver()
 export class PostResolver {
+    @Query(() => Post)
+    async post(@Arg("id") id: number): Promise<Post | null> {
+        const postRepo = AppDataSource.getRepository(Post);
+        const post = await postRepo.findOne({ where: { id } });
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        return post;
+    }
+
     @Query(() => [Post])
     async posts() {
         const postRepo = AppDataSource.getRepository(Post);
         return postRepo.find();
     }
+
+
 
     @Mutation(() => Post)
     async createPost(
