@@ -1,0 +1,8 @@
+query PostDetail($id:Float!) {
+    post(id:$id) {
+        id
+        title
+        content
+        createdAt
+    }
+}

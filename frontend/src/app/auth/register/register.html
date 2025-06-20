@@ -1,0 +1,25 @@
+<h2>회원가입</h2>
+<form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+    <div class="form-group">
+        <label for="username">사용자 이름</label>
+        <input type="text" id="username" name="username" class="form-control" required [(ngModel)]="username">
+    </div>
+
+    <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" class="form-control" required [(ngModel)]="password">
+    </div>
+    <div>
+        <label for="email">이메일</label>
+        <input type="email" id="email" name="email" class="form-control" required [(ngModel)]="email">
+    </div>
+    <button type="submit" class="btn btn-primary">회원가입</button>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-2">
+        회원가입 실패!
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-2">
+        회원가입 성공!
+    </div>
+</form>

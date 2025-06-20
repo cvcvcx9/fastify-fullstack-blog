@@ -1,0 +1,22 @@
+<h2>로그인</h2>
+<form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+    <div class="form-group">
+        <label for="username">사용자 이름</label>
+        <input type="text" id="username" name="username" class="form-control" required [(ngModel)]="username">
+    </div>
+    
+    <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" class="form-control" required [(ngModel)]="password">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">로그인</button>
+    
+    <div *ngIf="errorMessage" class="alert alert-danger mt-2">
+        로그인실패!
+    </div>
+    
+    <div *ngIf="successMessage" class="alert alert-success mt-2">
+        로그인성공!
+    </div>
+</form>
